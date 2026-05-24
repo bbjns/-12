@@ -1,0 +1,72 @@
+from pathlib import Path
+from zipfile import ZipFile
+import base64, mimetypes
+
+img_path = Path("/mnt/data/C68C03B1-A212-470B-9E7E-13018EB20504.jpeg")
+out_dir = Path("/mnt/data/pixel_clone_single_file")
+out_dir.mkdir(exist_ok=True)
+
+mime = "image/jpeg"
+b64 = base64.b64encode(img_path.read_bytes()).decode("ascii")
+data_url = f"data:{mime};base64,{b64}"
+
+html = f'''<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Winner Sport</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+html,body{{background:#000;font-family:Arial,sans-serif;overflow-x:hidden}}
+.wrapper{{position:relative;width:100%;max-width:1600px;margin:0 auto;background:#000}}
+.bg{{width:100%;display:block}}
+.hotspot{{position:absolute;border-radius:12px;z-index:5}}
+.hotspot:hover{{outline:2px solid rgba(246,198,93,.65);box-shadow:0 0 24px rgba(246,198,93,.5)}}
+
+/* 顶部注册 */
+.register{{top:1.1%;right:1.2%;width:9%;height:3.6%}}
+
+/* 平台卡片区域 */
+.xbet{{left:2.2%;top:42.6%;width:31%;height:23.3%}}
+.win{{left:34.8%;top:42.6%;width:31%;height:23.3%}}
+.mbet{{left:67.2%;top:42.6%;width:31%;height:23.3%}}
+
+/* 底部联系方式 */
+.tg{{left:7%;bottom:6.7%;width:5%;height:3.4%}}
+.mail{{left:13%;bottom:6.7%;width:5%;height:3.4%}}
+.lt{{left:19%;bottom:6.7%;width:5%;height:3.4%}}
+
+@media(max-width:768px){{
+  .wrapper{{width:100%;max-width:none}}
+  .register{{top:1%;right:1%;width:16%;height:3.8%}}
+  .xbet{{left:2.2%;top:42.6%;width:31%;height:23.3%}}
+  .win{{left:34.8%;top:42.6%;width:31%;height:23.3%}}
+  .mbet{{left:67.2%;top:42.6%;width:31%;height:23.3%}}
+}}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <img class="bg" src="{data_url}" alt="Winner Sport">
+
+  <a class="hotspot register" href="https://www.1xtw.org" target="_blank" rel="noopener"></a>
+
+  <a class="hotspot xbet" href="https://www.1xtw.org" target="_blank" rel="noopener"></a>
+  <a class="hotspot win" href="http://1w8.org" target="_blank" rel="noopener"></a>
+  <a class="hotspot mbet" href="https://mbet8.net" target="_blank" rel="noopener"></a>
+
+  <a class="hotspot tg" href="https://t.me/cz11888" target="_blank" rel="noopener"></a>
+  <a class="hotspot mail" href="mailto:qy229900@gmail.com"></a>
+  <a class="hotspot lt" href="https://www.letstalk.net/detect.html?k=Vzutg3qfEwKBHivc" target="_blank" rel="noopener"></a>
+</div>
+</body>
+</html>'''
+
+(out_dir / "index.html").write_text(html, encoding="utf-8")
+
+zip_path = "/mnt/data/pixel_clone_single_file.zip"
+with ZipFile(zip_path, "w") as z:
+    z.write(out_dir / "index.html", arcname="index.html")
+
+print("created", zip_path)
