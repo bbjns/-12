@@ -1,1 +1,70 @@
+from pathlib import Path
+from zipfile import ZipFile
+import base64
+
+# 找到参考图
+candidates = [
+    Path("/mnt/data/C68C03B1-A212-470B-9E7E-13018EB20504.jpeg"),
+    Path("/mnt/data/a_high_detail_web_landing_page_banner_style_imag.png"),
+    Path("/mnt/data/a_dark_gold_black_sports_betting_landing_page_styl.png")
+]
+img_path = next(p for p in candidates if p.exists())
+
+out = Path("/mnt/data/winner_pixel_final")
+out.mkdir(exist_ok=True)
+
+data = base64.b64encode(img_path.read_bytes()).decode("ascii")
+mime = "image/jpeg" if img_path.suffix.lower() in [".jpg", ".jpeg"] else "image/png"
+
+html = f"""<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Winner Sport</title>
+<style>
+*{{margin:0;padding:0;box-sizing:border-box}}
+html,body{{background:#000;font-family:Arial,sans-serif}}
+.page{{position:relative;width:100%;max-width:1400px;margin:0 auto}}
+.bg{{display:block;width:100%;height:auto}}
+a.hot{{position:absolute;z-index:10;border-radius:10px}}
+a.hot:hover{{outline:2px solid rgba(246,198,93,.75);box-shadow:0 0 25px rgba(246,198,93,.55)}}
+
+.register{{right:2.1%;top:2.1%;width:8.5%;height:4.2%}}
+.xbet{{left:5.5%;top:44.6%;width:27.5%;height:20.8%}}
+.onewin{{left:36.3%;top:44.6%;width:27.5%;height:20.8%}}
+.mbet{{left:67.1%;top:44.6%;width:27.5%;height:20.8%}}
+.tg{{left:7.2%;bottom:7.1%;width:4.2%;height:4.2%}}
+.email{{left:12.5%;bottom:7.1%;width:4.2%;height:4.2%}}
+.letstalk{{left:17.8%;bottom:7.1%;width:4.2%;height:4.2%}}
+
+@media(max-width:768px){{
+  .page{{max-width:none}}
+  .register{{right:1.5%;top:1.8%;width:14%;height:4.5%}}
+}}
+</style>
+</head>
+<body>
+<div class="page">
+<img class="bg" src="data:{mime};base64,{data}" alt="Winner Sport">
+
+<a class="hot register" href="https://www.1xtw.org" target="_blank" rel="noopener"></a>
+<a class="hot xbet" href="https://www.1xtw.org" target="_blank" rel="noopener"></a>
+<a class="hot onewin" href="http://1w8.org" target="_blank" rel="noopener"></a>
+<a class="hot mbet" href="https://mbet8.net" target="_blank" rel="noopener"></a>
+
+<a class="hot tg" href="https://t.me/cz11888" target="_blank" rel="noopener"></a>
+<a class="hot email" href="mailto:qy229900@gmail.com"></a>
+<a class="hot letstalk" href="https://www.letstalk.net/detect.html?k=Vzutg3qfEwKBHivc" target="_blank" rel="noopener"></a>
+</div>
+</body>
+</html>"""
+
+(out / "index.html").write_text(html, encoding="utf-8")
+
+zip_path = "/mnt/data/winner_pixel_final.zip"
+with ZipFile(zip_path, "w") as z:
+    z.write(out / "index.html", arcname="index.html")
+
+print("created:", zip_path)
 
