@@ -1,70 +1,534 @@
 from pathlib import Path
 from zipfile import ZipFile
-import base64
 
-# 找到参考图
-candidates = [
-    Path("/mnt/data/C68C03B1-A212-470B-9E7E-13018EB20504.jpeg"),
-    Path("/mnt/data/a_high_detail_web_landing_page_banner_style_imag.png"),
-    Path("/mnt/data/a_dark_gold_black_sports_betting_landing_page_styl.png")
-]
-img_path = next(p for p in candidates if p.exists())
+base = Path("/mnt/data/winner_operator_pro")
+base.mkdir(exist_ok=True)
 
-out = Path("/mnt/data/winner_pixel_final")
-out.mkdir(exist_ok=True)
-
-data = base64.b64encode(img_path.read_bytes()).decode("ascii")
-mime = "image/jpeg" if img_path.suffix.lower() in [".jpg", ".jpeg"] else "image/png"
-
-html = f"""<!doctype html>
+html = r'''<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Winner Sport</title>
+<meta name="description" content="Winner Sport 全球体育娱乐入口，主推 1xBet，聚合 1win、Mbet、Dafabet 平台入口。">
+<title>Winner Sport｜全球体育娱乐入口</title>
 <style>
-*{{margin:0;padding:0;box-sizing:border-box}}
-html,body{{background:#000;font-family:Arial,sans-serif}}
-.page{{position:relative;width:100%;max-width:1400px;margin:0 auto}}
-.bg{{display:block;width:100%;height:auto}}
-a.hot{{position:absolute;z-index:10;border-radius:10px}}
-a.hot:hover{{outline:2px solid rgba(246,198,93,.75);box-shadow:0 0 25px rgba(246,198,93,.55)}}
-
-.register{{right:2.1%;top:2.1%;width:8.5%;height:4.2%}}
-.xbet{{left:5.5%;top:44.6%;width:27.5%;height:20.8%}}
-.onewin{{left:36.3%;top:44.6%;width:27.5%;height:20.8%}}
-.mbet{{left:67.1%;top:44.6%;width:27.5%;height:20.8%}}
-.tg{{left:7.2%;bottom:7.1%;width:4.2%;height:4.2%}}
-.email{{left:12.5%;bottom:7.1%;width:4.2%;height:4.2%}}
-.letstalk{{left:17.8%;bottom:7.1%;width:4.2%;height:4.2%}}
-
-@media(max-width:768px){{
-  .page{{max-width:none}}
-  .register{{right:1.5%;top:1.8%;width:14%;height:4.5%}}
-}}
+:root{
+  --bg:#060607;
+  --panel:#101114;
+  --panel2:#15171b;
+  --gold:#f6c65d;
+  --gold2:#b77822;
+  --blue:#0d8dff;
+  --green:#1fb65a;
+  --red:#d91e38;
+  --text:#ffffff;
+  --muted:#a9adb7;
+  --line:rgba(246,198,93,.22);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",Arial,sans-serif;
+  background:
+    radial-gradient(circle at 78% 10%,rgba(246,198,93,.16),transparent 26%),
+    radial-gradient(circle at 18% 72%,rgba(13,141,255,.12),transparent 26%),
+    linear-gradient(180deg,#050506,#090a0d 48%,#050506);
+  color:var(--text);
+  overflow-x:hidden;
+}
+a{text-decoration:none;color:inherit}
+.wrap{width:min(1180px,calc(100% - 32px));margin:auto}
+.header{
+  position:sticky;
+  top:0;
+  z-index:50;
+  background:rgba(6,6,7,.84);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.nav{
+  height:72px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:950;
+}
+.brand-mark{
+  width:44px;height:44px;
+  border-radius:14px;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#7e5014,#fff0ae,#b77822);
+  color:#111;
+  font-size:26px;
+  box-shadow:0 0 30px rgba(246,198,93,.22);
+}
+.brand strong{display:block;color:var(--gold);font-size:22px;letter-spacing:.4px}
+.brand small{display:block;color:#fff;opacity:.72;font-size:10px;letter-spacing:5px;margin-top:2px}
+.nav-links{
+  display:flex;
+  align-items:center;
+  gap:28px;
+  color:#d9dce3;
+  font-size:14px;
+  font-weight:800;
+}
+.nav-links a:hover{color:var(--gold)}
+.nav-cta{
+  padding:11px 18px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#c78925,#fff0a5,#ad721d);
+  color:#111;
+  font-weight:950;
+}
+.hero{
+  position:relative;
+  min-height:650px;
+  overflow:hidden;
+  border-bottom:1px solid rgba(246,198,93,.18);
+}
+.hero:before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(90deg,rgba(0,0,0,.95),rgba(0,0,0,.76) 44%,rgba(0,0,0,.38)),
+    url("https://images.unsplash.com/photo-1556056504-5c7696c4c28d?auto=format&fit=crop&w=1800&q=80") center/cover;
+  transform:scale(1.02);
+}
+.hero:after{
+  content:"";
+  position:absolute;
+  right:-160px;
+  bottom:-120px;
+  width:650px;
+  height:250px;
+  border-radius:50%;
+  border-top:18px solid rgba(246,198,93,.7);
+  filter:drop-shadow(0 0 30px rgba(246,198,93,.46));
+  transform:rotate(-12deg);
+}
+.hero-inner{
+  position:relative;
+  z-index:2;
+  min-height:650px;
+  display:grid;
+  grid-template-columns:1.05fr .95fr;
+  gap:48px;
+  align-items:center;
+  padding:72px 0;
+}
+.kicker{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:9px 15px;
+  border-radius:999px;
+  background:rgba(246,198,93,.12);
+  border:1px solid rgba(246,198,93,.4);
+  color:#ffe29a;
+  font-weight:950;
+  margin-bottom:24px;
+}
+h1{
+  font-size:clamp(42px,6vw,74px);
+  line-height:1.06;
+  letter-spacing:-2.2px;
+  color:#fff0b2;
+  text-shadow:0 6px 24px rgba(0,0,0,.74);
+}
+.hero-sub{
+  margin-top:18px;
+  font-size:clamp(20px,3vw,32px);
+  color:#fff;
+  font-weight:950;
+}
+.hero-copy{
+  margin-top:18px;
+  max-width:660px;
+  color:#d2d6df;
+  font-size:17px;
+  line-height:1.8;
+}
+.hero-actions{
+  margin-top:30px;
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.btn{
+  min-width:172px;
+  height:54px;
+  border-radius:12px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:950;
+  position:relative;
+  overflow:hidden;
+}
+.btn.gold{
+  color:#111;
+  background:linear-gradient(135deg,#c78925,#fff0a5,#ad721d);
+  box-shadow:0 16px 36px rgba(246,198,93,.2);
+}
+.btn.dark{
+  color:#f6c65d;
+  border:1px solid rgba(246,198,93,.36);
+  background:rgba(0,0,0,.42);
+}
+.btn:after,.enter:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  transform:translateX(-125%);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.58),transparent);
+  animation:shine 3.1s infinite;
+}
+@keyframes shine{to{transform:translateX(125%)}}
+.app-card{
+  position:relative;
+  border-radius:30px;
+  padding:24px;
+  background:linear-gradient(160deg,rgba(255,255,255,.13),rgba(255,255,255,.04));
+  border:1px solid rgba(246,198,93,.28);
+  box-shadow:0 34px 90px rgba(0,0,0,.48);
+  overflow:hidden;
+}
+.app-card:before{
+  content:"";
+  position:absolute;
+  inset:-55%;
+  background:conic-gradient(transparent,rgba(246,198,93,.22),transparent 32%);
+  animation:spin 8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+.app-screen{
+  position:relative;
+  z-index:1;
+  min-height:420px;
+  border-radius:24px;
+  padding:24px;
+  background:
+    radial-gradient(circle at 72% 18%,rgba(13,141,255,.26),transparent 28%),
+    linear-gradient(180deg,#121a27,#090b0f);
+}
+.app-logo{
+  font-size:58px;
+  font-weight:950;
+  letter-spacing:-2px;
+  margin-top:24px;
+}
+.app-logo span{color:var(--blue)}
+.app-screen p{
+  margin-top:16px;
+  color:#dce2ef;
+  font-size:18px;
+  line-height:1.7;
+}
+.app-points{
+  margin-top:22px;
+  display:grid;
+  gap:12px;
+}
+.point{
+  padding:14px 16px;
+  border-radius:14px;
+  background:rgba(255,255,255,.065);
+  border:1px solid rgba(255,255,255,.1);
+  color:#fff;
+  font-weight:800;
+}
+.contact-strip{
+  position:relative;
+  z-index:5;
+  margin:-46px auto 0;
+  padding:22px;
+  border-radius:22px;
+  background:rgba(8,8,9,.96);
+  border:1px solid rgba(246,198,93,.42);
+  box-shadow:0 20px 60px rgba(0,0,0,.5),0 0 28px rgba(246,198,93,.13);
+}
+.contact-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+.contact-card{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  padding:18px;
+  border-radius:16px;
+  background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.1);
+}
+.contact-icon{
+  width:52px;height:52px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  font-size:24px;
+  flex:none;
+}
+.tg{background:linear-gradient(135deg,#28a8ff,#1165d1)}
+.lt{background:linear-gradient(135deg,#38d86e,#13803b)}
+.mail{background:linear-gradient(135deg,#ff5c72,#c41630)}
+.contact-card b{display:block;color:var(--gold);font-size:14px;margin-bottom:5px}
+.contact-card a{font-size:18px;font-weight:950;word-break:break-all}
+.section{padding:62px 0}
+.title{text-align:center;margin-bottom:30px}
+.title h2{font-size:34px;color:var(--gold);margin-bottom:10px}
+.title p{color:var(--muted)}
+.platforms{
+  display:grid;
+  grid-template-columns:1.25fr 1fr 1fr 1fr;
+  gap:18px;
+}
+.platform{
+  min-height:335px;
+  border-radius:22px;
+  background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.035));
+  border:1px solid rgba(255,255,255,.12);
+  overflow:hidden;
+  transition:.28s;
+}
+.platform:hover{
+  transform:translateY(-8px);
+  border-color:rgba(246,198,93,.48);
+  box-shadow:0 22px 60px rgba(0,0,0,.42);
+}
+.platform.featured{
+  border-color:rgba(246,198,93,.62);
+  box-shadow:0 18px 54px rgba(246,198,93,.08);
+}
+.logo-panel{
+  height:130px;
+  padding:22px;
+  display:flex;
+  align-items:flex-end;
+  font-size:36px;
+  font-weight:950;
+}
+.xbet{background:radial-gradient(circle at 70% 18%,#168dff,#0d1627 68%)}
+.onewin{background:radial-gradient(circle at 70% 18%,#20c4ff,#0d1627 68%)}
+.mbet{background:radial-gradient(circle at 70% 18%,#25bd65,#0d1627 68%)}
+.dafa{background:radial-gradient(circle at 70% 18%,#e3283e,#0d1627 68%)}
+.platform-body{padding:20px}
+.tag{
+  display:inline-flex;
+  padding:6px 10px;
+  border-radius:999px;
+  background:var(--gold);
+  color:#111;
+  font-size:12px;
+  font-weight:950;
+  margin-bottom:12px;
+}
+.platform-body h3{font-size:23px;color:var(--gold);margin-bottom:10px}
+.platform-body p{color:#d5d9e2;line-height:1.68;min-height:82px}
+.enter{
+  margin-top:18px;
+  height:48px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:linear-gradient(135deg,#c78925,#fff0a5,#ad721d);
+  color:#111;
+  font-weight:950;
+  position:relative;
+  overflow:hidden;
+}
+.footer{
+  padding:34px 0;
+  background:#060606;
+  border-top:1px solid rgba(255,255,255,.08);
+  color:#888;
+  text-align:center;
+}
+.float{
+  position:fixed;
+  right:18px;
+  bottom:18px;
+  z-index:60;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.float a{
+  width:54px;height:54px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:linear-gradient(135deg,#c78925,#fff0a5,#ad721d);
+  color:#111;
+  font-weight:950;
+  box-shadow:0 0 28px rgba(246,198,93,.32);
+}
+@media(max-width:1050px){
+  .nav-links{display:none}
+  .hero-inner{grid-template-columns:1fr}
+  .app-card{max-width:520px}
+  .contact-grid{grid-template-columns:1fr}
+  .platforms{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:620px){
+  .wrap{width:calc(100% - 26px)}
+  .nav{height:64px}
+  .brand-mark{width:40px;height:40px}
+  .brand strong{font-size:18px}
+  .brand small{letter-spacing:3px}
+  .nav-cta{padding:10px 14px;font-size:13px}
+  .hero{min-height:auto}
+  .hero-inner{min-height:auto;padding:52px 0 74px;gap:30px}
+  h1{letter-spacing:-1px}
+  .hero-copy{font-size:15px}
+  .hero-actions{flex-direction:column}
+  .btn{width:100%}
+  .app-screen{min-height:300px}
+  .app-logo{font-size:46px}
+  .contact-strip{margin-top:-42px;padding:14px}
+  .contact-card{padding:14px}
+  .contact-icon{width:46px;height:46px;font-size:21px}
+  .contact-card a{font-size:16px}
+  .section{padding:48px 0}
+  .platforms{grid-template-columns:1fr}
+  .logo-panel{height:118px}
+  .float a{width:50px;height:50px}
+}
 </style>
 </head>
 <body>
-<div class="page">
-<img class="bg" src="data:{mime};base64,{data}" alt="Winner Sport">
+<header class="header">
+  <div class="wrap nav">
+    <a class="brand" href="#">
+      <span class="brand-mark">W</span>
+      <span><strong>WINNER SPORT</strong><small>OFFICIAL</small></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#platforms">平台入口</a>
+      <a href="#contact">联系方式</a>
+      <a href="#main">1xBet APP</a>
+    </nav>
+    <a class="nav-cta" href="https://www.1xtw.org" target="_blank" rel="noopener">立即注册</a>
+  </div>
+</header>
 
-<a class="hot register" href="https://www.1xtw.org" target="_blank" rel="noopener"></a>
-<a class="hot xbet" href="https://www.1xtw.org" target="_blank" rel="noopener"></a>
-<a class="hot onewin" href="http://1w8.org" target="_blank" rel="noopener"></a>
-<a class="hot mbet" href="https://mbet8.net" target="_blank" rel="noopener"></a>
+<main>
+<section class="hero" id="main">
+  <div class="wrap hero-inner">
+    <div>
+      <div class="kicker">🏆 主推平台 · 1xBet</div>
+      <h1>全球体育娱乐<br>官方入口中心</h1>
+      <div class="hero-sub">业内最强 APP · 应用商店直接下载</div>
+      <p class="hero-copy">精选 1xBet、1win、Mbet、Dafabet 四大热门平台，体育赛事、真人娱乐、电竞游戏一站直达。</p>
+      <div class="hero-actions">
+        <a class="btn gold" href="https://www.1xtw.org" target="_blank" rel="noopener">进入 1xBet</a>
+        <a class="btn dark" href="#contact">联系客服</a>
+      </div>
+    </div>
 
-<a class="hot tg" href="https://t.me/cz11888" target="_blank" rel="noopener"></a>
-<a class="hot email" href="mailto:qy229900@gmail.com"></a>
-<a class="hot letstalk" href="https://www.letstalk.net/detect.html?k=Vzutg3qfEwKBHivc" target="_blank" rel="noopener"></a>
+    <div class="app-card">
+      <div class="app-screen">
+        <div class="kicker">APP DOWNLOAD</div>
+        <div class="app-logo">1x<span>Bet</span></div>
+        <p>应用商店直接下载<br>稳定更新 · 长期可用</p>
+        <div class="app-points">
+          <div class="point">✓ 体育 / 真人 / 电竞 / 娱乐</div>
+          <div class="point">✓ 移动端流畅访问</div>
+          <div class="point">✓ 官方客服快速联系</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="wrap contact-strip" id="contact">
+  <div class="contact-grid">
+    <a class="contact-card" href="https://t.me/cz11888" target="_blank" rel="noopener">
+      <span class="contact-icon tg">✈</span>
+      <span><b>Telegram</b>@cz11888</span>
+    </a>
+    <a class="contact-card" href="https://www.letstalk.net/detect.html?k=Vzutg3qfEwKBHivc" target="_blank" rel="noopener">
+      <span class="contact-icon lt">L</span>
+      <span><b>LetsTalk 国内专用</b>点击联系</span>
+    </a>
+    <a class="contact-card" href="mailto:qy229900@gmail.com">
+      <span class="contact-icon mail">✉</span>
+      <span><b>Email</b>qy229900@gmail.com</span>
+    </a>
+  </div>
+</section>
+
+<section class="section" id="platforms">
+  <div class="wrap">
+    <div class="title">
+      <h2>热门平台入口</h2>
+      <p>主推 1xBet，其他平台同步展示</p>
+    </div>
+
+    <div class="platforms">
+      <article class="platform featured">
+        <div class="logo-panel xbet">1xBet</div>
+        <div class="platform-body">
+          <span class="tag">主推平台</span>
+          <h3>1xBet</h3>
+          <p>业内最强 APP，应用商店直接下载，稳定更新，适合体育与综合娱乐用户。</p>
+          <a class="enter" href="https://www.1xtw.org" target="_blank" rel="noopener">立即进入</a>
+        </div>
+      </article>
+
+      <article class="platform">
+        <div class="logo-panel onewin">1win</div>
+        <div class="platform-body">
+          <h3>1win</h3>
+          <p>体育、电竞、真人、电玩综合娱乐平台，移动端体验流畅。</p>
+          <a class="enter" href="http://1w8.org" target="_blank" rel="noopener">立即进入</a>
+        </div>
+      </article>
+
+      <article class="platform">
+        <div class="logo-panel mbet">Mbet</div>
+        <div class="platform-body">
+          <h3>Mbet</h3>
+          <p>亚洲热门线上娱乐入口，访问简洁，适合快速进入体验。</p>
+          <a class="enter" href="https://mbet8.net" target="_blank" rel="noopener">立即进入</a>
+        </div>
+      </article>
+
+      <article class="platform">
+        <div class="logo-panel dafa">Dafabet</div>
+        <div class="platform-body">
+          <h3>Dafabet</h3>
+          <p>国际体育与真人娱乐品牌，适合体育赛事和综合娱乐用户。</p>
+          <a class="enter" href="https://dafa8.me" target="_blank" rel="noopener">立即进入</a>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+</main>
+
+<div class="float">
+  <a href="https://t.me/cz11888" target="_blank" rel="noopener">TG</a>
+  <a href="https://www.letstalk.net/detect.html?k=Vzutg3qfEwKBHivc" target="_blank" rel="noopener">LT</a>
 </div>
+
+<footer class="footer">© 2026 Winner Sport. All Rights Reserved.</footer>
 </body>
-</html>"""
+</html>'''
 
-(out / "index.html").write_text(html, encoding="utf-8")
+(base / "index.html").write_text(html, encoding="utf-8")
 
-zip_path = "/mnt/data/winner_pixel_final.zip"
+zip_path = "/mnt/data/winner_operator_pro.zip"
 with ZipFile(zip_path, "w") as z:
-    z.write(out / "index.html", arcname="index.html")
+    z.write(base / "index.html", arcname="index.html")
 
-print("created:", zip_path)
-
+print(zip_path)
